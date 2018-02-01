@@ -2,7 +2,6 @@ package com.example.Springhotel;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.icons.VaadinIcons;
-import com.vaadin.osgi.themes.ValoThemeContribution;
 import com.vaadin.server.Page;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.shared.ui.ContentMode;
@@ -13,14 +12,13 @@ import com.vaadin.ui.renderers.NumberRenderer;
 import com.vaadin.ui.themes.ValoTheme;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 
-@SpringUI(path = "/manager")
+@SpringUI(path="/test")
 @Theme("valo")
-public class mainUI extends UI {
+public class testUI extends UI {
 
   private ArrayList<Person> persons = Server.getArray();
 
@@ -33,16 +31,36 @@ public class mainUI extends UI {
     mainGrid.addStyleName("example-gridlayout");
     mainGrid.setSizeFull();
 
-    mainGrid.addComponent(tab(), 8, 0, 15, 15);
+    mainGrid.addComponent(tab(), 10, 0, 15, 15);
 
-    Button button = new Button("Redirect to test page");
-    button.addClickListener(click -> Page.getCurrent().setLocation("test"));
-    mainGrid.addComponent(button);
+    Button button = new Button("Redirect to manager page");
+    Button button2 = new Button("Test button");
+    Button button3 = new Button("Enable/disable test button");
+    button.addClickListener(click -> Page.getCurrent().setLocation("manager"));
+    button2.addClickListener(click -> new Notification("Hello I'am test button :)").show(Page.getCurrent()));
+    button3.addClickListener(click -> {
+      if( button2.isEnabled())
+        button2.setEnabled(false);
+      else
+      button2.setEnabled(true);
+    });
 
-    mainGrid.addComponent(createGuest(),0,1);
+    mainGrid.addComponent(button,0,0);
+    mainGrid.addComponent(button2,0,1);
+    mainGrid.addComponent(button3,0,2);
 
-    mainGrid.addComponent(createGuest(),3,3);
+    Panel panel = new Panel("Panel Text");
+    panel.setHeight(100.0f, Unit.PERCENTAGE);
+    final VerticalLayout contentLayout = new VerticalLayout();
+    contentLayout.setWidth(500, Unit.PIXELS);
+    contentLayout.setHeight(100.f, Unit.PERCENTAGE);
+    contentLayout.setSpacing(false);
+    contentLayout.addComponent(new Label(text(), ContentMode.HTML));
 
+    panel.setContent(contentLayout);
+
+
+    mainGrid.addComponent(panel,1,0,6,8);
 
     setContent(mainGrid);
 
@@ -67,8 +85,10 @@ public class mainUI extends UI {
   }
 
 
+
   private Grid data() {
     Grid<Person> grid = new Grid<>();
+
 
     grid.setCaption("Double click to edit");
     grid.setSizeFull();
@@ -78,119 +98,27 @@ public class mainUI extends UI {
 
     TextField nameEditor = new TextField();
     TextField fieldEditLast = new TextField();
-    grid.addColumn(Person::getId, new NumberRenderer("%02d"))
-      .setCaption("ID")
-      .setWidth(60)
-      .setResizable(false)
-    ;
 
     grid.addColumn(Person::getName)
       .setEditorComponent(nameEditor, Person::setName)
       .setCaption("First Name")
-      .setMaximumWidth(200)
-      .setResizable(false)
+      .setExpandRatio(2)
+      .setMinimumWidth(150)
     ;
 
     grid.addColumn(Person::getLast_name)
       .setEditorComponent(fieldEditLast, Person::setLast_name)
       .setCaption("Last Name")
-      .setMaximumWidth(200)
-      .setResizable(false)
-    ;
-    grid.addColumn(Person::getStartDate)
-      .setCaption("Start date")
-      .setResizable(false)
-    ;
-    grid.addColumn(Person::getEndDate)
-      .setCaption("End date")
-    .setResizable(false)
+      .setExpandRatio(2)
+      .setMinimumWidth(150)
     ;
 
-    grid.addComponentColumn(p -> deleteButton(p, grid))
-      .setCaption("Delete")
-      .setResizable(false)
-      .setSortable(false)
-    .setMaximumWidth(80)
-    ;
+
 
     grid.getEditor().setEnabled(true);
 
     return grid;
   }
-
-  private Button deleteButton(Person p, Grid grid) {
-    Button button = new Button(VaadinIcons.TRASH);
-    button.addStyleName(ValoTheme.BUTTON_SMALL);
-    button.addClickListener(e -> deletePerson(p));
-    grid.getDataProvider().refreshAll();
-    return button;
-  }
-
-  private void deletePerson(Person person) {
-    int id = person.getId();
-    int index = findPersonByID(id);
-
-    if (index != -1)
-      persons.remove(index);
-
-  }
-
-  private int findPersonByID(int id) {
-    for (int i = 0; i < persons.size(); i++) {
-      if (id == persons.get(i).getId())
-        return i;
-    }
-    return -1;
-  }
-
-  private HorizontalLayout date(){
-    HorizontalLayout layout = new HorizontalLayout();
-    InlineDateField inlineDateFieldStart = new InlineDateField("Start date");
-    inlineDateFieldStart.setValue(LocalDate.now());
-    inlineDateFieldStart.addValueChangeListener(event -> Notification.show("Value changed:",
-      String.valueOf(event.getValue()),
-      Notification.Type.TRAY_NOTIFICATION));
-    layout.addComponent(inlineDateFieldStart);
-
-    InlineDateField inlineDateFieldEnd = new InlineDateField("End date");
-    inlineDateFieldEnd.setValue(LocalDate.now());
-    inlineDateFieldEnd.addValueChangeListener(event -> Notification.show("Value changed:",
-      String.valueOf(event.getValue()),
-      Notification.Type.TRAY_NOTIFICATION));
-    layout.addComponent(inlineDateFieldEnd);
-
-    return layout;
-  }
-
-  private VerticalLayout createGuest(){
-    VerticalLayout layout = new VerticalLayout();
-    layout.setCaption("Check in new guest");
-    layout.addStyleName("border");
-    layout.setMargin(false);
-    TextField firstName = new TextField("Enter first name");
-    TextField  lastName = new TextField("Enter last name");
-    DateField startDate = new DateField();
-    DateField endDate = new DateField();
-
-    startDate.setValue(LocalDate.now());
-    startDate.addValueChangeListener(event -> Notification.show("Value changed:",
-      String.valueOf(event.getValue()),
-      Notification.Type.TRAY_NOTIFICATION));
-
-    endDate.setValue(LocalDate.now());
-    endDate.addValueChangeListener(event -> Notification.show("Value changed:",
-      String.valueOf(event.getValue()),
-      Notification.Type.TRAY_NOTIFICATION));
-
-    layout.addComponent(firstName);
-    layout.addComponent(lastName);
-    layout.addComponent(startDate);
-    layout.addComponent(endDate);
-
-
-    return layout;
-  }
-
 
   private String text() {
     return "Venenatis. Nullam risus massa, egestas in, facilisis tristique, molestie sed, mi. Duis euismod turpis sit amet quam. Vestibulum ornare felis eget dolor. Phasellus ac urna vel sapien lacinia adipiscing. Donec egestas felis id mi. Sed erat. Vestibulum porta vulputate neque. Maecenas scelerisque, sem id sodales pretium, sem mauris rhoncus magna, at scelerisque tortor mauris nec dui. Nullam blandit rhoncus velit. Nam accumsan, enim id vestibulum feugiat, lorem nibh placerat urna, eget laoreet diam tortor at lorem. Suspendisse imperdiet consectetur dolor. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ut massa eget erat dapibus sollicitudin. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Pellentesque a augue. Praesent non elit. Duis sapien dolor, cursus eget, pulvinar eget, eleifend a, est. Integer in nunc. Vivamus consequat ipsum id sapien. Duis eu elit vel libero posuere luctus. Aliquam ac turpis. Aenean vitae justo in sem iaculis pulvinar. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Aliquam sit amet mi. \n" +

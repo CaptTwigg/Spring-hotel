@@ -30,10 +30,12 @@ public class Server {
         //System.out.println(resultSet.getString("first_name") + ", " + resultSet.getString("last_name"));
 
         persons.add(
-          new Person.PersonBuilder()
-            .BuilderName(resultSet.getString("first_name"))
-            .BuilderLast_name(resultSet.getString("last_name"))
-            .BuilderId(Integer.parseInt(resultSet.getString("id")))
+          new Person.Builder()
+            .name(resultSet.getString("first_name"))
+            .last_name(resultSet.getString("last_name"))
+            .id(Integer.parseInt(resultSet.getString("id")))
+            .startDate(resultSet.getString("start_date"))
+            .endDate(resultSet.getString("end_date"))
             .build());
       }
     } catch (SQLException e) {
@@ -45,6 +47,13 @@ public class Server {
   public static void change(String table, String column, String replace, String id) throws SQLException {
     Connection conn = getConnection();
     PreparedStatement updateEXP = conn.prepareStatement("UPDATE " + table + " SET " + column + " = '" + replace + "' WHERE id = " + id);
+    updateEXP.executeUpdate();
+  }
+
+  public static void delete(String table, String id) throws SQLException {
+    Connection conn = getConnection();
+    assert conn != null;
+    PreparedStatement updateEXP = conn.prepareStatement("DELETE FROM" + table + "' WHERE id = " + id);
     updateEXP.executeUpdate();
   }
 

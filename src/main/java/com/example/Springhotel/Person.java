@@ -1,18 +1,14 @@
 package com.example.Springhotel;
 
-import com.vaadin.ui.Button;
-
 public class Person {
 
   private String name;
   private String last_name;
   private int id;
+  private String startDate;
+  private String endDate;
 
-
-  public Person(PersonBuilder builder) {
-    this.name = builder.name;
-    this.last_name = builder.last_name;
-    this.id = builder.id;
+  public Person() {
   }
 
   public String getName() {
@@ -39,54 +35,73 @@ public class Person {
     this.id = id;
   }
 
+  public String getStartDate() {
+    return startDate;
+  }
+
+  public void setStartDate(String startDate) {
+    this.startDate = startDate;
+  }
+
+  public String getEndDate() {
+    return endDate;
+  }
+
+  public void setEndDate(String endDate) {
+    this.endDate = endDate;
+  }
+
   @Override
   public String toString() {
-    return String.format("name: %s last_name: %s id: %s "
-            , this.name, this.last_name, this.id);
+    return String.format("name: %s last_name: %s id: %s startDate: %s endDate: %s "
+      , this.name, this.last_name, this.id, this.startDate, this.endDate);
   }
 
-  public String delete() {
-    return "Delete";
-  }
 
-  public final static class PersonBuilder {
+  public static final class Builder {
 
     private String name;
     private String last_name;
     private int id;
+    private String startDate;
+    private String endDate;
 
-//    private PersonBuilder() {
-//    }
+    public Builder() {
+    }
 
-//    public PersonBuilder(String name, String last_name, int id) {
-//      this.name = name;
-//      this.last_name = last_name;
-//      this.id = id;
-//
-//    }
-
-//    public PersonBuilder aPerson() {
-//      return new PersonBuilder();
-//    }
-
-    public PersonBuilder BuilderName(String name) {
+    public Builder name(String name) {
       this.name = name;
       return this;
     }
 
-    public PersonBuilder BuilderLast_name(String last_name) {
+    public Builder last_name(String last_name) {
       this.last_name = last_name;
       return this;
     }
 
-    public PersonBuilder BuilderId(int id) {
+    public Builder id(int id) {
       this.id = id;
       return this;
     }
 
+    public Builder startDate(String startDate) {
+      this.startDate = startDate;
+      return this;
+    }
+
+    public Builder endDate(String endDate) {
+      this.endDate = endDate;
+      return this;
+    }
+
     public Person build() {
-      return new Person(this);
+      Person person = new Person();
+      person.setName(name);
+      person.setLast_name(last_name);
+      person.setId(id);
+      person.setStartDate(startDate);
+      person.setEndDate(endDate);
+      return person;
     }
   }
-
 }
